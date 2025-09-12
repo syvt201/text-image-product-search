@@ -1,0 +1,43 @@
+your-project-name/
+│
+├── src/                      # Code chính (core logic)
+│   ├── db/                   # Các module liên quan đến database
+│   │   ├── mongo_utils.py    # Hàm add/find object trong MongoDB
+│   │   └── faiss_utils.py    # Hàm build, add, search FAISS index
+│   │
+│   ├── models/               # Code load và chạy model AI
+│   │   ├── clip_encoder.py   # Sinh embedding bằng CLIP
+│   │   ├── grounding_dino.py # Detect object bằng Grounding DINO
+│   │   └── sam_segment.py    # Segment object bằng SAM
+│   │
+│   ├── pipeline/             # Logic pipeline
+│   │   ├── add_image.py      # Flow: load ảnh → metadata → embedding → DB/FAISS
+│   │   ├── search.py         # Flow: text → embedding → search FAISS → lấy ảnh
+│   │   └── segment.py        # Flow: search result → segmentation object
+│   │
+│   └── config.py             # Config Mongo URI, model paths, constants
+│
+├── scripts/                  # Script CLI tiện ích
+│   ├── build_index.py        # Build FAISS index từ embeddings có sẵn
+│   ├── add_folder.py         # Thêm 1 folder ảnh vào DB + FAISS
+│   └── search_prompt.py      # Demo: nhập prompt → trả kết quả
+│
+├── notebooks/                # Jupyter notebooks demo
+│   ├── 01_generate_embeddings.ipynb
+│   ├── 02_search_demo.ipynb
+│   └── 03_segmentation_demo.ipynb
+│
+├── api/                      # Nếu bạn làm web service
+│   └── main.py               # FastAPI app: upload/search/segment endpoints
+│
+├── frontend/ (optional)      # Nếu có web UI demo
+│   └── app.py                # Streamlit/Gradio app
+│
+├── tests/                    # Unit test cho các module
+│
+├── requirements.txt          # Thư viện cần thiết (faiss, pymongo, torch, ...)
+├── README.md                 # Giới thiệu project, hướng dẫn chạy
+├── .gitignore                # Ignore data, faiss index, large files
+└── data/                     # Chỉ để vài ảnh demo nhỏ (không push data lớn)
+    ├── sample1.jpg
+    └── sample2.jpg
