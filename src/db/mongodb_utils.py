@@ -31,6 +31,7 @@ def insert_many(collection, documents):
     Returns:
         list: List of inserted document IDs (strs) or None if insertion fails
     """
+    
     try:
         if not documents:
             raise ValueError("The documents list is empty.")
@@ -51,9 +52,11 @@ def find_one(collection, query):
     Returns:
         dict: Found document or None if not found
     """
+    
     try:
         document = collection.find_one(query)
         return document
+    
     except Exception as e:
         print(f"Error finding document: {e}")
         return None
@@ -70,9 +73,11 @@ def find_many(collection, query, limit=-1):
     Returns:
         list: List of found documents
     """
+    
     try:
         cursor = collection.find(query, limit=limit)
         return list(cursor)
+    
     except Exception as e:
         print(f"Error finding documents: {e}")
         return []
@@ -197,10 +202,27 @@ def count_documents(collection, query):
         return 0
     
 def connect_to_mongodb(uri, db_name, collection_name):
-    client = MongoClient(uri)
-    db = client[db_name]
-    collection = db[collection_name]
+    """
+    Connect to a MongoDB database and return the database and collection objects
     
-    return db, collection
+    Args:
+        uri (str): The MongoDB connection
+        db_name (str): The name of database to connect to
+        collection_name (str): The name of connect to access within the database
+        
+    Return:
+        tuple: A tuple containing the MongoDB database and collection objects
+    """
+    
+    try:
+        client = MongoClient(uri)
+        db = client[db_name]
+        collection = db[collection_name]
+        
+        return db, collection
+    
+    except Exception as e:
+        print(f"Error connecting to MongoDB database: {e}")
+        return None, None
         
     
