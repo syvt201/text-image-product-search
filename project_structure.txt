@@ -41,3 +41,32 @@ your-project-name/
 └── data/                     # Chỉ để vài ảnh demo nhỏ (không push data lớn)
     ├── sample1.jpg
     └── sample2.jpg
+
+
+3. pipeline/segment.py
+
+Nhiệm vụ: từ ảnh kết quả search, chạy segmentation (SAM + Grounding DINO).
+
+Class chính: SegmentPipeline
+
+Các bước logic:
+
+Input: (image hoặc image_id từ DB).
+
+Nếu cần, chạy Grounding DINO để detect bounding boxes.
+
+Chạy SAM để segment ra mask(s).
+
+Trả kết quả: mask(s) + ảnh overlay.
+
+👉 Trong file:
+
+class SegmentPipeline: (constructor nhận sam_model, grounding_dino)
+
+def segment(self, image, text_prompt=None): ...
+
+Có thể tách nhỏ:
+
+_detect_objects(image, text_prompt)
+
+_segment_masks(image, boxes)

@@ -6,22 +6,22 @@ class CLIPEncoder:
     def __init__(self,model_name="openai/clip-vit-base-patch32", device=None):
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.model = CLIPModel.from_pretrained(model_name, attn_implementation="sdpa", use_safetensors=True).to(self.device)
-        self.processor = CLIPProcessor.from_pretrained(model_name, use_safetensors=True)
+        self.processor = CLIPProcessor.from_pretrained(model_name, use_safetensors=True, use_fast=True)
         
-    def encode(self, text=None, image_paths=None, normalize=True, as_numpy=True):
+    def encode(self, text=None, image_path=None, normalize=True, as_numpy=True):
         """
         Encode text and/or image to embeddings.
         Args:
             text (str or list of str): Text input(s) to encode.
-            image_paths (str or list[str]): Path(s) to image file(s) to encode.
+            image_path (str or list[str]): Path(s) to image file(s) to encode.
             normalize (bool): Whether to normalize the embeddings to unit length.
             as_numpy (bool): Whether to return embeddings as numpy arrays. If False, returns as PyTorch tensors.
         Returns:
             tuple: (text_embeddings, image_embeddings)  # (batch_size, embedding_dim=512)
         """
         
-        if text is None and image_paths is None:
-            raise ValueError("At least one of `text` or `image_paths` must be provied")
+        if text is None and image_path is None:
+            raise ValueError("At least one of `text` or `image_path` must be provied")
         
         with torch.inference_mode():
             text_embeds, image_embeds = None, None
@@ -30,9 +30,9 @@ class CLIPEncoder:
                 inputs = self.processor.tokenizer(text, return_tensors='pt', padding=True).to(self.device)
                 text_embeds = self.model.get_text_features(**inputs)
             
-            if image_paths is not None:
-                if isinstance(image_paths, str):
-                    image_paths = [image_paths]
+            if image_path is not None:
+                if isinstance(image_path, str):
+                    image_paths = [image_path]
 
                 if len(image_paths) > 0:
                     images = []

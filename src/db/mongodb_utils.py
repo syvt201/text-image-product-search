@@ -15,7 +15,7 @@ def insert_one(collection, document):
     try:
         result = collection.insert_one(document)
 
-        return str(result.inserted_id)
+        return result.inserted_id
     
     except Exception as e:
         print(f"Error inserting document: {e}")
@@ -61,7 +61,7 @@ def find_one(collection, query):
         print(f"Error finding document: {e}")
         return None
 
-def find_many(collection, query, limit=-1):
+def find_many(collection, query, limit=0):
     """
     Find multiple documents in a collection based on a query
     
