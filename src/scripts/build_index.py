@@ -23,7 +23,7 @@ for var in [MONGODB_URI, MONGO_DB, MONGO_COLLECTION_COUNTERS, MONGO_COLLECTION_M
     
 def get_image_metadata(file_path):
     stat_info = os.stat(file_path)
-    size = stat_info.st_size   # kích thước file (bytes)
+    size = stat_info.st_size   # (bytes)
     uploaded_at = datetime.fromtimestamp(stat_info.st_mtime, tz=timezone.utc)
     
     with Image.open(file_path) as img:
@@ -78,7 +78,7 @@ def build_index():
         
 
         # embedding
-        _, img_embedding = clip_encoder.encode(text=None, image_path=image_path)
+        _, img_embedding = clip_encoder.encode(text=None, image_paths=image_path)
         
         # add to faiss
         faiss_utils.add_embedding_with_id_to_index(index=faiss_index, id_ = np.array([next_id]), embedding=img_embedding)
