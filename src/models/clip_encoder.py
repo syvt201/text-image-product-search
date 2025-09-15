@@ -8,15 +8,13 @@ class CLIPEncoder:
         self.model = CLIPModel.from_pretrained(model_name, attn_implementation="sdpa", use_safetensors=True).to(self.device)
         self.processor = CLIPProcessor.from_pretrained(model_name, use_safetensors=True)
         
-    def encode(self, text=None, image_path=None, normalize=True, as_numpy=True):
+    def encode(self, text=None, image=None, normalize=True, as_numpy=True):
         with torch.inference_mode():
             if text is not None:
                 inputs = self.processor.tokenizer(text, return_tensors='pt', padding=True).to(self.device)
                 text_embeds = self.model.get_text_features(**inputs)
             else:
                 text_embeds = None
-            
-            image = Image.open(image_path).convert("RGB") if image_path is not None else None
             
             if image is not None:
                 inputs = self.processor.image_processor(image, return_tensors='pt').to(self.device)
