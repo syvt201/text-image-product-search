@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 
 def insert_one(collection, document):
     """
@@ -9,7 +9,7 @@ def insert_one(collection, document):
         document (dict): Document to insert
         
     Returns:
-        str: Inserted document ID or None if insertion fails
+        ObjectId: Inserted document ID or None if insertion fails
     """
     
     try:
@@ -29,7 +29,7 @@ def insert_many(collection, documents):
         documents (list[dict]): List of documents to insert
         
     Returns:
-        list: List of inserted document IDs (strs) or None if insertion fails
+        list: List of inserted document IDs (ObjectId) or None if insertion fails
     """
     
     try:
@@ -37,7 +37,7 @@ def insert_many(collection, documents):
             raise ValueError("The documents list is empty.")
         result = collection.insert_many(documents)
         
-        return [str(_id) for _id in result.inserted_ids]
+        return result.inserted_ids
     
     except Exception as e:
         print(f"Error inserting documents: {e}")
@@ -225,4 +225,24 @@ def connect_to_mongodb(uri, db_name, collection_name):
         print(f"Error connecting to MongoDB database: {e}")
         return None, None
         
+def find_one_and_update(collection, query, update, upsert=False):
+    """
+    Find a single document and update it, optionally inserting a new document if no match is found
+    
+    Args:
+        collection: MongoDB collection object
+        query (dict): Query to match the document
+        update (dict): Update operations to apply
+        upsert (bool): If True, insert a new document if no match is found
+    Returns:
+        dict: The updated document after the update, or None if no document was found and upsert is False
+    """
+    
+    try:
+        document = collection.find_one_and_update(query, update, upsert=upsert, return_document=ReturnDocument.AFTER,)
+        return document
+    
+    except Exception as e:
+        print(f"Error finding and updating document: {e}")
+        return None
     
