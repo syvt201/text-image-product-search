@@ -70,3 +70,4 @@ Có thể tách nhỏ:
 _detect_objects(image, text_prompt)
 
 _segment_masks(image, boxes)
+

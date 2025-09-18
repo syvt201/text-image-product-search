@@ -13,7 +13,7 @@ class AddImagePipeline:
         self.mapping_collection = mapping_collection
         self.clip_encoder = clip_encoder
     
-    def add_image(self, image_path):
+    def add_image(self, image_path: str):
         """
         Add an image to the database and FAISS index.
         Args:

@@ -53,10 +53,10 @@ if __name__ == "__main__":
     # Example usage
     # text_query = "The girl wearing a red spaghetti strap top"
     text_query = None
-    image_path = "/mnt/e/text-image-product-search/scripts/handbag.jpg"  # or provide a valid image path
+    image_path = "scripts/handbag.jpg"
     top_k = 5
     
-    results, distances = search(text=text_query, image_path=image_path, top_k=top_k)
+    results, distances = search(text=text_query, image_path=os.path.abspath(image_path), top_k=top_k)
     
     for i, (doc, dist) in enumerate(zip(results, distances)):
         print(f"Result {i+1}:")

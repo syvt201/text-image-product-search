@@ -12,12 +12,12 @@ class SearchPipeline:
         self.mapping_collection = mapping_collection
         self.clip_encoder = clip_encoder
         
-    def search(self, query=None, image_path=None, top_k=5):
+    def search(self, query: str = None, image_path: str = None, top_k: int = 5):
         """
         Search images based on a text query or image.
         Args:
-            query (str, Optional): The text query to search for. Defaults to None.
-            image_path (str, optional): Path to the image file. Defaults to None.
+            query (str): The text query to search for. Defaults to None.
+            image_path (str): Path to the image file. Defaults to None.
             top_k (int): The number of top results to return.
         Returns:
             list: List of metadata documents for the top_k most similar images.
