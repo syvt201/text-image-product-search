@@ -2,7 +2,7 @@ from transformers import SamModel, SamProcessor, infer_device
 from PIL import Image
 import torch
 import numpy as np
-from src.utils import mask_to_polygon, get_boxes, polygon_to_mask, refine_masks
+from src.utils import get_boxes, polygon_to_mask, refine_masks
 
 class SamSegmentator:
     def __init__(self, model_id="facebook/sam-vit-base", device=None):
@@ -11,32 +11,39 @@ class SamSegmentator:
         self.model = SamModel.from_pretrained(model_id).to(self.device)
     
     def segment(self, 
-                image: str | list[str] | Image.Image | list[Image.Image], 
+                image: str | Image.Image, 
                 detection_results: list[dict],
                 polygon_refinement: bool = False
     ):
+        """ 
+        Segment objects in the image based on detection results.
+        
+        Args:
+            image (str | PIL.Image): The input image or path to the image file.
+            detection_results (list[dict]): List of detection results containing bounding boxes.
+            polygon_refinement (bool): Whether to refine masks using polygon approximation.   
+        
+        Returns:
+            list[dict]: List of detection results with added segmentation masks.
+        """
         
         if image is None or detection_results is None:
             raise ValueError("Both `image` and `detection_results` must be provided")
         
-        if not isinstance(image, list):
-            image = [image]
         
-        pil_images = []
-        for img in image:
-            if isinstance(img, str):
-                with Image.open(img) as im:
-                    pil_images.append(im.convert("RGB").copy())
-            elif isinstance(img, Image.Image):
-                pil_images.append(img if img.mode == "RGB" else img.convert("RGB"))
-            else:
-                raise ValueError("`image` must be a file path, a PIL Image, or a list of either")
-            
+        if isinstance(image, str):
+            with Image.open(image) as im:
+                pil_image = im.convert("RGB").copy()
+        elif isinstance(image, Image.Image):
+            pil_image = image if image.mode == "RGB" else image.convert("RGB")
+        else:
+            raise ValueError("`image` must be a file path or a PIL Image")
+        
         boxes = get_boxes(results=detection_results)
-        inputs = self.processor(images=pil_images, input_boxes=boxes, return_tensors="pt").to(self.device)
+        inputs = self.processor(images=pil_image, input_boxes=boxes, return_tensors="pt").to(self.device)
         with torch.inference_mode():
             outputs = self.model(**inputs)
-            
+        
         masks = self.processor.post_process_masks(
             masks=outputs.pred_masks,
             original_sizes=inputs.original_sizes,
@@ -44,12 +51,8 @@ class SamSegmentator:
         )[0]
         
         masks = refine_masks(masks, polygon_refinement)
+
         for detection_result, mask in zip(detection_results, masks):
             detection_result.mask = mask
 
-        return detection_results 
-        
-        
-                
-
-    
+        return detection_results
