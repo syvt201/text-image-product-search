@@ -1,5 +1,5 @@
 from src.db import faiss_utils as faiss_utils , mongodb_utils as mongodb_utils
-from src.utils import get_image_metadata
+from src.utils.helpers import get_image_metadata
 import os
 import numpy as np
 

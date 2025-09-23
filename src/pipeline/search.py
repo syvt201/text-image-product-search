@@ -57,12 +57,6 @@ class SearchPipeline:
         indices= indices.flatten().tolist()  # shape (1, top_k) ---> (top_k,)
         distances = distances.flatten().tolist()  
         
-        # # sort by distance
-        # sorted_pairs = sorted(zip(indices, distances), key=lambda x: x[1], reverse=True)
-        # indices, distances = zip(*sorted_pairs)
-        # indices = list(indices)
-        # distances = list(distances)
-        
         if len(indices) == 0:
             print("No similar images found.")
             return []

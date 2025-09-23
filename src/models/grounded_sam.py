@@ -44,7 +44,7 @@ class GroundedSamSegmentator:
             raise ValueError("`image` must be a file path or a PIL Image")
                 
         detections = self.detector.detect(text=labels, image=image, threshold=threshold)
-        results = self.segmentator.segment(image=image, detection_results=detections, polygon_refinement=polygon_refinement)
+        segment_results = self.segmentator.segment(image=image, detection_results=detections, polygon_refinement=polygon_refinement)
 
-        return np.array(image), results
+        return np.array(image), segment_results
         

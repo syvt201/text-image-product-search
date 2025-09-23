@@ -162,3 +162,27 @@ def annotate(image: Image.Image | np.ndarray, detection_results: list[DetectionR
             cv2.drawContours(image_cv2, contours, -1, color.tolist(), 2)
 
     return cv2.cvtColor(image_cv2, cv2.COLOR_BGR2RGB)
+
+def smooth_mask(mask: np.ndarray | Image.Image, kernel_size: int = 5) -> np.ndarray:
+    """
+    Apply Gaussian smoothing to the mask.
+    
+    Args:
+        mask (np.ndarray or PIL Image): The input mask to smooth.
+        kernel_size (int): Size of the Gaussian kernel. Must be an odd integer.
+        
+    Returns:
+        np.ndarray: Smoothed image in RGB format.
+    """
+    if kernel_size % 2 == 0:
+        raise ValueError("kernel_size must be an odd integer.")
+    if isinstance(mask, Image.Image):
+        mask = np.array(mask)
+        
+    if len(mask.shape) == 3 and mask.shape[2] == 3:
+        mask = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
+    elif len(mask.shape) != 2:
+        raise ValueError("mask must be a 2D array or a 3-channel RGB image.")
+    
+    smoothed_image = cv2.GaussianBlur(mask, (kernel_size, kernel_size), 0)
+    return smoothed_image

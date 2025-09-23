@@ -2,7 +2,7 @@ from transformers import pipeline, infer_device
 from PIL import Image
 import string
 import torch
-from src.utils import DetectionResult
+from src.utils.helpers import DetectionResult
 
 class GroundingDinoDetector:
     def __init__(self, model_id: str = "IDEA-Research/grounding-dino-tiny", device=None):

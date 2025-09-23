@@ -2,7 +2,7 @@ from transformers import SamModel, SamProcessor, infer_device
 from PIL import Image
 import torch
 import numpy as np
-from src.utils import get_boxes, polygon_to_mask, refine_masks
+from src.utils.helpers import get_boxes, polygon_to_mask, refine_masks
 
 class SamSegmentator:
     def __init__(self, model_id="facebook/sam-vit-base", device=None):

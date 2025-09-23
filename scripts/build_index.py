@@ -8,12 +8,11 @@ from datetime import datetime, timezone
 from PIL import Image
 import numpy as np
 from src.pipeline.add_image import AddImagePipeline
-from src.utils import get_image_metadata
+from src.utils.helpers import get_image_metadata
 
 load_dotenv()
 
 # Load environment variables
-
     
 def build_index(image_dir, load_faiss_index=False):
     """ Build or load FAISS index and add images from a directory.
