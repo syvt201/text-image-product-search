@@ -52,11 +52,12 @@ def search(text=None, image_path=None, top_k=5):
 if __name__ == "__main__":
     # Example usage
     # text_query = "The girl wearing a red spaghetti strap top"
-    text_query = None
-    image_path = "scripts/handbag.jpg"
+    text_query = "a man in a white shirt."
+    # image_path = "scripts/hat.jpg"
+    image_path = None
     top_k = 5
     
-    results, distances = search(text=text_query, image_path=os.path.abspath(image_path), top_k=top_k)
+    results, distances = search(text=text_query, image_path=os.path.abspath(image_path) if image_path else None, top_k=top_k)
     
     for i, (doc, dist) in enumerate(zip(results, distances)):
         print(f"Result {i+1}:")

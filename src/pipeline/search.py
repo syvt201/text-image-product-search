@@ -1,7 +1,7 @@
 from src.db import faiss_utils, mongodb_utils
 from src.models.clip_encoder import CLIPEncoder
 import numpy as np 
-
+from PIL import Image
 # text ---> embedding ---> search FAISS ---> get mongo_id ---> get metadata from MongoDB
 class SearchPipeline:
     """ Pipeline to search images based on text query. """
@@ -12,12 +12,12 @@ class SearchPipeline:
         self.mapping_collection = mapping_collection
         self.clip_encoder = clip_encoder
         
-    def search(self, query: str = None, image_path: str = None, top_k: int = 5):
+    def search(self, query: str = None, image_path: str | Image.Image = None, top_k: int = 5):
         """
         Search images based on a text query or image.
         Args:
             query (str): The text query to search for. Defaults to None.
-            image_path (str): Path to the image file. Defaults to None.
+            image_path (str or PIL Image): The path to the image file or a PIL Image to search for. Defaults to None.
             top_k (int): The number of top results to return.
         Returns:
             list: List of metadata documents for the top_k most similar images.
@@ -45,21 +45,23 @@ class SearchPipeline:
             
         elif image_path is not None:
             # embed image
+            if not (isinstance(image_path, (str, Image.Image))):
+                raise ValueError("image_path must be a file path or a PIL Image.")
             try:
-                _, image_embedding = self.clip_encoder.encode(image_path=image_path)
+                _, image_embedding = self.clip_encoder.encode(image=image_path)
             except Exception as e:
-                raise RuntimeError(f"Failed to encode image from path '{image_path}': {e}")
+                raise RuntimeError(f"Failed to encode image: {e}")
             
             distances, indices = faiss_utils.search_index(index=self.faiss_index, query_embedding=image_embedding, top_k=top_k)
             
         indices= indices.flatten().tolist()  # shape (1, top_k) ---> (top_k,)
         distances = distances.flatten().tolist()  
         
-        # sort by distance
-        sorted_pairs = sorted(zip(indices, distances), key=lambda x: x[1], reverse=True)
-        indices, distances = zip(*sorted_pairs)
-        indices = list(indices)
-        distances = list(distances)
+        # # sort by distance
+        # sorted_pairs = sorted(zip(indices, distances), key=lambda x: x[1], reverse=True)
+        # indices, distances = zip(*sorted_pairs)
+        # indices = list(indices)
+        # distances = list(distances)
         
         if len(indices) == 0:
             print("No similar images found.")
