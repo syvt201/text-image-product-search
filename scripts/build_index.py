@@ -51,7 +51,7 @@ def build_index(image_dir, load_faiss_index=False, drop_existing_collections=Fal
                                           mapping_collection=faiss_mapping_collection,
                                           clip_encoder=clip_encoder)
     
-    add_image_pipeline.add_image(image_dir=image_dir, batch_size=64)
+    add_image_pipeline.add_image(image_dir=image_dir, batch_size=128)
         
     # save faiss index
     faiss_utils.save_index(faiss_index, config.FAISS_INDEX_SAVE_PATH)

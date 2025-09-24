@@ -32,35 +32,34 @@ class AddImagePipeline:
         except Exception as e:  
             raise RuntimeError(f"Failed to encode image {image_path}: {e}")
         
-        next_ids = []
+        # add metadata batch
+        documents = [get_image_metadata(p) for p in image_paths]
+        inserted_ids = mongodb_utils.insert_many(collection=self.metadata_collection, documents=documents)
         
-        for image_path in image_paths:
-            # add metadata
-            inserted_id = mongodb_utils.insert_one(collection=self.metadata_collection, 
-                                                    document=get_image_metadata(image_path))
-            
-            # update counter
-            counter = mongodb_utils.find_one_and_update(collection=self.counter_collection,
+        # Generate IDs in batch
+        batch_size = len(image_paths)
+        counter = mongodb_utils.find_one_and_update(collection=self.counter_collection,
                                                         query={"_id": "vector_id"},
-                                                        update={"$inc": {"seq": 1}},
+                                                        update={"$inc": {"seq": batch_size}},
                                                         upsert=True)
-            
-            next_id = counter["seq"]
-            next_ids.append(next_id)
-            
-            # mapping faiss_id <---> mongo_id
-            mongodb_utils.insert_one(collection=self.mapping_collection,
-                                        document={
-                                        "faiss_id": next_id,
-                                        "mongo_id": inserted_id 
-                                        })
-            
-            print(f"Inserted {os.path.basename(image_path)} -> mongo_id={inserted_id}, faiss_id={next_id}")
+        start_id = counter["seq"] - batch_size + 1
+        next_ids = list(range(start_id, start_id + batch_size))
 
-        # add to faiss
-        faiss_utils.add_embedding_with_id_to_index(index=self.faiss_index, id_ = np.array(next_ids), embedding=img_embeddings)
+        # Insert mapping batch
+        mapping_docs = [
+            {"faiss_id": next_id, "mongo_id": inserted_id}
+            for next_id, inserted_id in zip(next_ids, inserted_ids)
+        ]
+        mongodb_utils.insert_many(collection=self.mapping_collection, documents=mapping_docs)
         
-        print(f"Added image embedding(s) to Faiss index with id(s) {next_ids} and updated MongoDB.")
+        # Add to Faiss
+        faiss_utils.add_embedding_with_id_to_index(
+            index=self.faiss_index,
+            id_=np.array(next_ids),
+            embedding=img_embeddings
+        )
+
+        print(f"Inserted {len(image_paths)} images into MongoDB and added embeddings to Faiss index.")
         
     def add_image(self, image_dir: str = None, image: str | list[str] = None, batch_size: int = 8):
         """

@@ -244,7 +244,7 @@ def connect_to_mongodb(uri, db_name, collection_name):
         print(f"Error connecting to MongoDB database: {e}")
         return None, None
         
-def find_one_and_update(collection, query, update, upsert=False):
+def find_one_and_update(collection, query, update, upsert=False, return_document=ReturnDocument.AFTER):
     """
     Find a single document and update it, optionally inserting a new document if no match is found
     
@@ -253,12 +253,14 @@ def find_one_and_update(collection, query, update, upsert=False):
         query (dict): Query to match the document
         update (dict): Update operations to apply
         upsert (bool): If True, insert a new document if no match is found
+        return_document: Specifies whether to return the document before or after the update. Can be either ReturnDocument.BEFORE or ReturnDocument.AFTER.
+        
     Returns:
         dict: The updated document after the update, or None if no document was found and upsert is False
     """
     
     try:
-        document = collection.find_one_and_update(query, update, upsert=upsert, return_document=ReturnDocument.AFTER,)
+        document = collection.find_one_and_update(query, update, upsert=upsert, return_document=return_document)
         return document
     
     except Exception as e:
