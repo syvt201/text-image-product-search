@@ -12,7 +12,7 @@ class SamSegmentator:
     
     def segment(self, 
                 image: str | Image.Image, 
-                detection_results: list[dict],
+                detection_results: list[dict] = None,
                 polygon_refinement: bool = False
     ):
         """ 
@@ -38,9 +38,12 @@ class SamSegmentator:
             pil_image = image if image.mode == "RGB" else image.convert("RGB")
         else:
             raise ValueError("`image` must be a file path or a PIL Image")
-        
-        boxes = get_boxes(results=detection_results)
-        inputs = self.processor(images=pil_image, input_boxes=boxes, return_tensors="pt").to(self.device)
+        if detection_results:
+            boxes = get_boxes(results=detection_results)
+            inputs = self.processor(images=pil_image, input_boxes=boxes, return_tensors="pt").to(self.device)
+        else:
+            inputs = self.processor(images=pil_image, return_tensors="pt").to(self.device)
+            
         with torch.inference_mode():
             outputs = self.model(**inputs)
         

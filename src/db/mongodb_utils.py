@@ -182,6 +182,25 @@ def drop_collection(collection):
     except Exception as e:
         print(f"Error dropping collection: {e}")
         return False
+
+def drop_all_collections(uri, db_name):
+    """
+    Drop all collections from database
+    Args:
+        uri (str): The MongoDB connection
+        db_name: Name of MongoDB database
+    """
+    
+    try:
+        client = MongoClient(uri)
+        db = client[db_name]
+        collections = db.list_collection_names()
+        for col in collections:
+            db[col].drop()
+            print(f"Dropped collection: {col}")
+    
+    except Exception as e:
+        print(f"Error dropping collection: {e}")
     
 def count_documents(collection, query):
     """

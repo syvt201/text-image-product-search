@@ -14,7 +14,7 @@ load_dotenv()
 
 # Load environment variables
     
-def build_index(image_dir, load_faiss_index=False):
+def build_index(image_dir, load_faiss_index=False, drop_existing_collections=False):
     """ Build or load FAISS index and add images from a directory.
     Args:
         image_dir (str): Directory containing images to add to the index.
@@ -27,6 +27,11 @@ def build_index(image_dir, load_faiss_index=False):
     if not isinstance(image_dir, str):
         raise ValueError("image_dir must be a string.")
     
+    if drop_existing_collections:
+        mongodb_utils.drop_all_collections(config.MONGODB_URI, config.MONGO_DB)
+        print(f"All collections from {config.MONGO_DB} database are droppped")
+
+    # connect or create new collections
     _, metadata_collection = mongodb_utils.connect_to_mongodb(config.MONGODB_URI, config.MONGO_DB, config.MONGO_COLLECTION_METADATA)
     _, counter_collection = mongodb_utils.connect_to_mongodb(config.MONGODB_URI, config.MONGO_DB, config.MONGO_COLLECTION_COUNTERS)
     _, faiss_mapping_collection = mongodb_utils.connect_to_mongodb(config.MONGODB_URI, config.MONGO_DB, config.MONGO_COLLECTION_FAISS_MAPPING)
@@ -46,12 +51,7 @@ def build_index(image_dir, load_faiss_index=False):
                                           mapping_collection=faiss_mapping_collection,
                                           clip_encoder=clip_encoder)
     
-    for file in os.listdir(image_dir):
-        if not file.lower().endswith((".jpg", ".png", ".jpeg")):
-            continue
-        
-        image_path = os.path.join(image_dir, file)
-        add_image_pipeline.add_image(image_path)
+    add_image_pipeline.add_image(image_dir=image_dir, batch_size=64)
         
     # save faiss index
     faiss_utils.save_index(faiss_index, config.FAISS_INDEX_SAVE_PATH)
@@ -59,4 +59,4 @@ def build_index(image_dir, load_faiss_index=False):
     print(f"Saved faiss index into {config.FAISS_INDEX_SAVE_PATH}")
 
 if __name__ == "__main__":
-    build_index(image_dir=config.IMAGE_DIR, load_faiss_index=False)
+    build_index(image_dir=config.IMAGE_DIR, load_faiss_index=False, drop_existing_collections=True)
