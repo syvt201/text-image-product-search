@@ -12,22 +12,23 @@ class SearchPipeline:
         self.mapping_collection = mapping_collection
         self.clip_encoder = clip_encoder
         
-    def search(self, query: str = None, image_path: str | Image.Image = None, top_k: int = 5):
+    def search(self, query: str = None, image: str | Image.Image = None, top_k: int = 5):
         """
         Search images based on a text query or image.
         Args:
             query (str): The text query to search for. Defaults to None.
-            image_path (str or PIL Image): The path to the image file or a PIL Image to search for. Defaults to None.
+            image (str or PIL Image): The path to the image file or a PIL Image to search for. Defaults to None.
             top_k (int): The number of top results to return.
         Returns:
             list: List of metadata documents for the top_k most similar images.
         """
+        query = query if query and query.strip() != "" else None
         
-        if query is None and image_path is None:
-            raise ValueError("Either query or image_path must be provided.")
+        if query is None and image is None:
+            raise ValueError("Either query or image must be provided.")
         
-        if query is not None and image_path is not None:
-            raise ValueError("Only one of query or image_path should be provided.")
+        if query is not None and image is not None:
+            raise ValueError("Only one of query or image should be provided.")
         
         if not isinstance(top_k, int) or top_k <= 0:
             raise ValueError("top_k must be a positive integer.")
@@ -43,12 +44,12 @@ class SearchPipeline:
         
             distances, indices = faiss_utils.search_index(index=self.faiss_index, query_embedding=text_embedding, top_k=top_k)
             
-        elif image_path is not None:
+        elif image is not None:
             # embed image
-            if not (isinstance(image_path, (str, Image.Image))):
+            if not (isinstance(image, (str, Image.Image))):
                 raise ValueError("image_path must be a file path or a PIL Image.")
             try:
-                _, image_embedding = self.clip_encoder.encode(image=image_path)
+                _, image_embedding = self.clip_encoder.encode(image=image)
             except Exception as e:
                 raise RuntimeError(f"Failed to encode image: {e}")
             

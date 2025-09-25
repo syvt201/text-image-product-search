@@ -3,8 +3,8 @@ from src.utils.helpers import annotate
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image, ImageFilter
-labels = ["a cat.", "a remote control."]
-img_path = "/mnt/e/text-image-product-search/images/000000039769.jpg"
+labels = ["cars"]
+img_path = "/mnt/e/coco/coco2017/test2017/000000300735.jpg"
 
 gs = GroundedSamSegmentator()
 image, segment_results = gs.grounded_segmentation(image=img_path, labels=labels, threshold=0.3, polygon_refinement=True) 
