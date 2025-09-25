@@ -43,9 +43,9 @@ def create_app():
                 return img_array, seg_results
             
             segment_button.click(fn=perform_segmentation, inputs=[seg_image, labels, threshold, polygon_refinement], outputs=[seg_output_image, seg_output_data])
-            
+        
     return app
 
 if __name__ == "__main__":
-    demo = create_app()
-    demo.launch(server_name="0.0.0.0", server_port=8080, allowed_paths=["/mnt/e/coco/coco2017/test2017"])
+    app = create_app()
+    app.launch(server_name="0.0.0.0", server_port=8080, allowed_paths=["/mnt/e/coco/coco2017/test2017"])
