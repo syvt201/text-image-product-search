@@ -12,7 +12,7 @@ class SearchPipeline:
         self.mapping_collection = mapping_collection
         self.clip_encoder = clip_encoder
         
-    def search(self, query: str = None, image: str | Image.Image = None, top_k: int = 5):
+    def search(self, query: str = None, image: str | Image.Image = None, top_k: int = 5, alpha: float = 0.5):
         """
         Search images based on a text query or image.
         Args:
@@ -27,8 +27,6 @@ class SearchPipeline:
         if query is None and image is None:
             raise ValueError("Either query or image must be provided.")
         
-        if query is not None and image is not None:
-            raise ValueError("Only one of query or image should be provided.")
         
         if not isinstance(top_k, int) or top_k <= 0:
             raise ValueError("top_k must be a positive integer.")
@@ -42,9 +40,9 @@ class SearchPipeline:
             except Exception as e:
                 raise RuntimeError(f"Failed to encode text '{query}': {e}")
         
-            distances, indices = faiss_utils.search_index(index=self.faiss_index, query_embedding=text_embedding, top_k=top_k)
+            # distances, indices = faiss_utils.search_index(index=self.faiss_index, query_embedding=text_embedding, top_k=top_k)
             
-        elif image is not None:
+        if image is not None:
             # embed image
             if not (isinstance(image, (str, Image.Image))):
                 raise ValueError("image_path must be a file path or a PIL Image.")
@@ -53,8 +51,17 @@ class SearchPipeline:
             except Exception as e:
                 raise RuntimeError(f"Failed to encode image: {e}")
             
-            distances, indices = faiss_utils.search_index(index=self.faiss_index, query_embedding=image_embedding, top_k=top_k)
-            
+            # distances, indices = faiss_utils.search_index(index=self.faiss_index, query_embedding=image_embedding, top_k=top_k)
+        
+        if query is not None and image is not None:
+            query_embedding = alpha * image_embedding + (1 - alpha) * text_embedding
+        elif query is not None:
+            query_embedding = text_embedding
+        else:
+            query_embedding = image_embedding
+        
+        distances, indices = faiss_utils.search_index(index=self.faiss_index, query_embedding=query_embedding, top_k=top_k)
+        
         indices= indices.flatten().tolist()  # shape (1, top_k) ---> (top_k,)
         distances = distances.flatten().tolist()  
         

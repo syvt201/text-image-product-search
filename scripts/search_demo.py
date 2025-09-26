@@ -10,7 +10,7 @@ from src.pipeline.search import SearchPipeline
 
 load_dotenv()
 
-def search(text = None, image: str | Image.Image = None, top_k = 5):
+def search(text = None, image: str | Image.Image = None, top_k = 5, alpha = 0.5):
     """ Search images based on a text query or image.
     Args:
         text (str, Optional): The text query to search for. Defaults to None.
@@ -46,18 +46,18 @@ def search(text = None, image: str | Image.Image = None, top_k = 5):
                                         mapping_collection=faiss_mapping_collection,
                                         clip_encoder=clip_encoder)
     
-    results, distances = add_image_pipeline.search(query=text, image=image, top_k=top_k)
+    results, distances = add_image_pipeline.search(query=text, image=image, top_k=top_k, alpha=alpha)
     return results, distances
 
 if __name__ == "__main__":
     # Example usage
     # text_query = "The girl wearing a red spaghetti strap top"
-    text_query = "car and motor"
-    # image_path = "scripts/hat.jpg"
-    image_path = None
+    text_query = "Red fighter"
+    image_path = "scripts/jet_fighter.jpg"
+    # image_path = None
     top_k = 5
     
-    results, distances = search(text=text_query, image=os.path.abspath(image_path) if image_path else None, top_k=top_k)
+    results, distances = search(text=text_query, image=os.path.abspath(image_path) if image_path else None, top_k=top_k, alpha=0.3)
     
     for i, (doc, dist) in enumerate(zip(results, distances)):
         print(f"Result {i+1}:")
