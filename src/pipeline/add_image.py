@@ -30,7 +30,7 @@ class AddImagePipeline:
         try:
             _, img_embeddings = self.clip_encoder.encode(image=image_paths) # img_embeddings will be in cpu (as_numpy=True as default)
         except Exception as e:  
-            raise RuntimeError(f"Failed to encode image {image_path}: {e}")
+            raise RuntimeError(f"Failed to encode image(s): {e}")
         
         # add metadata batch
         documents = [get_image_metadata(p) for p in image_paths]
@@ -59,7 +59,6 @@ class AddImagePipeline:
             embedding=img_embeddings
         )
 
-        print(f"Inserted {len(image_paths)} images into MongoDB and added embeddings to Faiss index.")
         
     def add_image(self, image_dir: str = None, image: str | list[str] = None, batch_size: int = 8):
         """
@@ -98,12 +97,14 @@ class AddImagePipeline:
             for i in range(0, len(image_paths), batch_size):
                 batch_paths = image_paths[i: min(i + batch_size, len(image_paths))]
                 self._process_and_add_images(batch_paths)
+                print(f"Inserted {i + batch_size:06d} images into MongoDB and added embeddings to Faiss index.")
         else:
             if isinstance(image, str):
                 image_paths = [image]
             elif isinstance(image, list) and all(isinstance(p, str) for p in image):
                 image_paths = image
             self._process_and_add_images(image_paths)
+            print(f"Inserted {len(image_paths):06d} images into MongoDB and added embeddings to Faiss index.")
             
             
         

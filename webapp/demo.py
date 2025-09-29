@@ -7,6 +7,7 @@ import src.db.mongodb_utils as mongodb_utils
 from src.models.clip_encoder import CLIPEncoder
 import src.config as config
 from src.pipeline.search import SearchPipeline
+import cv2
 
 _, metadata_collection = mongodb_utils.connect_to_mongodb(config.MONGODB_URI, config.MONGO_DB, config.MONGO_COLLECTION_METADATA)
 _, faiss_mapping_collection = mongodb_utils.connect_to_mongodb(config.MONGODB_URI, config.MONGO_DB, config.MONGO_COLLECTION_FAISS_MAPPING)
@@ -27,7 +28,7 @@ segmentator = GroundedSamSegmentator()
 
 css = """
     #gallery div {
-        max-height: 80vh !important;
+        max-height: 75vh !important;
     }
     
     .hide {
@@ -43,6 +44,20 @@ bg_colors = {
     "Yellow": [255, 236, 141],
 }
 
+def smooth_edges(img, ksize=5, sigma=1.0, thresh=0.5):
+    blurred = cv2.GaussianBlur(img.astype(np.float32), (ksize, ksize), sigma)
+    blurred = blurred / blurred.max()
+    smoothed = (blurred > thresh).astype(np.uint8) * 255
+    return smoothed
+
+def smooth_contour(mask, epsilon=2.0):
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    smooth_mask = np.zeros_like(mask)
+    for cnt in contours:
+        approx = cv2.approxPolyDP(cnt, epsilon, True)
+        cv2.fillPoly(smooth_mask, [approx], 255)
+    return smooth_mask
+
 
 def perform_segmentation(image, lbls, selected_bg_color):
     if not lbls:
@@ -54,14 +69,14 @@ def perform_segmentation(image, lbls, selected_bg_color):
     for i in range(len(seg_results)):
         mask[seg_results[i].mask > 0] = i + 1
     
-    mask_img = img_array.copy()
     
+    mask_img = img_array.copy()
     bg_color = bg_colors[selected_bg_color]
     r, g, b = bg_color
     mask_img[:, :, 0][mask == 0] = r
     mask_img[:, :, 1][mask == 0] = g
     mask_img[:, :, 2][mask == 0] = b
-        
+    
     # return mask_img, img_array
     return [mask_img]
 
@@ -106,7 +121,7 @@ with gr.Blocks(css=css) as demo:
         with gr.Column(scale=2):
             text_query = gr.Textbox(label="Text query", placeholder="Enter text to search/segment images...")
             input_image = gr.Image(label="Image", type="pil")
-            top_k = gr.Number(label="Top K Results", value=6, precision=0, elem_id="top_k")
+            top_k = gr.Number(label="Top K Results", value=3, precision=0, elem_id="top_k")
             alpha = gr.Slider(label="Image weight", minimum=0.0, maximum=1.0, value=0.3, elem_id="img_search_weight", elem_classes=["hide"])
             bg_selector = gr.Radio(choices=bg_colors.keys(), label="Background Color", value="White", elem_id="bg_selector", elem_classes=["hide"])
             task_selector = gr.Radio(choices=["Image Search", "Image Segmentation"], label="Task", value="Image Search")
@@ -123,4 +138,4 @@ with gr.Blocks(css=css) as demo:
         outputs=[top_k, alpha, bg_selector]
     )
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=8080, allowed_paths=["/mnt/e/coco/coco2017/test2017"])
+    demo.launch(server_name="0.0.0.0", server_port=8080, allowed_paths=[config.IMAGE_DIR])
