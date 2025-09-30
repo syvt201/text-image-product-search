@@ -4,7 +4,7 @@ This document explains the internal architecture and data flow of the project.
 
 ---
 
-## **Overview**
+## 📖 Overview
 
 The system enables:
 - Encoding images/text with **CLIP**.
@@ -15,7 +15,7 @@ The system enables:
 - Use the segmented object as the query to search similar objects.
 ---
 
-## **Pipeline**
+## 🔄 Pipeline
 **1. Add Image Flow**
 
 **Goal:** Add new images into the system so they can be searched later.
@@ -67,7 +67,7 @@ The system enables:
 * **Apply mask ➝ output cropped/segmented object**
 ---
 
-## **Components**
+## 🧩Components
 
 **Models**
 
