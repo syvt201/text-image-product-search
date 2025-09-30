@@ -40,7 +40,7 @@ The system enables:
 * **Encode query ➝ CLIP embedding**
     - If text ➝ CLIP text encoder
     - If image ➝ CLIP image encoder
-    - If both ➝ Encode the image and text separately, then combine their vectors using the formula: a.image_vector + (1-a).text_vector, where 0 ≤ a ≤ 1.
+    - If both ➝ Encode the image and text separately, then combine their vectors using the formula: `a.image_vector + (1-a).text_vector, where 0 ≤ a ≤ 1`.
 - **If text ➝ CLIP text encoder**
 
 - **If image ➝ CLIP image encoder**
@@ -69,25 +69,25 @@ The system enables:
 
 **Models**
 
-* [`clip_encoder.py`](src/models/clip_encoder.py) – Encodes image/text.
+* [`clip_encoder.py`](../src/models/clip_encoder.py) – Encodes image/text.
 
-* [`grounding_dino.py`](src/models/grounding_dino.py) – Object detection.
+* [`grounding_dino.py`](../src/models/grounding_dino.py) – Object detection.
 
-* [`sam_segment.py`](src/models/sam_segment.py) – Segmentation.
+* [`sam_segment.py`](../src/models/sam_segment.py) – Segmentation.
 
-* [`grounded_sam.py`](src/models/grounded_sam.py) – Combined pipeline.
+* [`grounded_sam.py`](../src/models/grounded_sam.py) – Combined pipeline.
 
 **Database**
 
-* [`faiss_utils.py`](src/db/faiss_utils.py)
+* [`faiss_utils.py`](../src/db/faiss_utils.py)
 
     Provides helper functions to:
     - Initialize and configure FAISS index.
     - Insert embedding vectors.
-    - Perform nearest-neighbor search (using **L2 distance - Euclidean**).
+    - Perform nearest-neighbor search (using `L2 distance - Euclidean`).
     - Save/load index to disk.
 
-* [`mongodb_utils.py`](src/db/mongodb_utils.py)
+* [`mongodb_utils.py`](../src/db/mongodb_utils.py)
 
     Provides helper functions to:
     - Manage MongoDB collections.
@@ -97,10 +97,10 @@ The system enables:
   
 **Pipelines**
 
-* [`add_image.py`](src/pipeline/add_image.py) – Batch ingestion.
+* [`add_image.py`](../src/pipeline/add_image.py) – Batch ingestion.
 
-* [`search.py`](src/pipeline/search.py) – Search pipeline.
+* [`search.py`](../src/pipeline/search.py) – Search pipeline.
 
 **Webapp**
 
-* [`demo.py`](webapp/demo.py)– Gradio UI.
+* [`demo.py`](../webapp/demo.py)– Gradio UI.
