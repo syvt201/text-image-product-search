@@ -29,7 +29,7 @@ The system enables:
 * **Insert metadata ➝ MongoDB**
 
 * **Insert embedding ➝ FAISS index**
----
+
 
 **2. Search Flow**
 
@@ -50,7 +50,6 @@ The system enables:
 - **Fetch metadata (image path, tags, info) from MongoDB**
 
 - **Return ranked results (images + metadata)**
----
 
 **3. Segmentation Flow**
 
@@ -65,7 +64,6 @@ The system enables:
 * **Segment Anything Model (SAM) ➝ generate mask**
 
 * **Apply mask ➝ output cropped/segmented object**
----
 
 ## 🧩Components
 
