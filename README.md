@@ -25,7 +25,8 @@ Built with **CLIP, FAISS, MongoDB, GroundingDINO, SAM, and Gradio**.
   - Built with **Gradio** for quick demo and user-friendly UI. 
 
 ## 📂 Project Structure
-![](images/project_structure.png)
+![](images/project_structure_1.jpg)
+![](images/project_structure_2.jpg)
 
 ## ⚙️ Installation
 ```
