@@ -55,11 +55,22 @@ python -m webapp.demo.py
 
 ## 🖥️ Demo
 
-### Here’s how the Gradio UI looks:
+### Here's how the Gradio UI looks:
 
 ![](images/UI.png)
 
-### 🔍 Search by Text
+### 1. 🔍 Search by Text
 ![](images/search_by_text.gif)
 
-### 🎯 Segment + Search
+### 2. 🔍 Search by Image
+![](images/search_by_image.gif)
+
+### 3. 🔍 Search by Text + Image
+![](images/search_by_text&image.gif)
+
+### 4. 🎯 Segment + Search
+![](images/segment&search.gif)
+
+## 📖 Docs
+
+See [docs/usage.md](docs/usage.md) and [docs/architecture.md](docs/architecture.md) for more details.

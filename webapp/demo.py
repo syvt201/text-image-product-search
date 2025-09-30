@@ -1,6 +1,6 @@
 import gradio as gr
 from src.models.grounded_sam import GroundedSamSegmentator
-from scripts.search_demo import search
+from experiments.search_demo import search
 import numpy as np
 import src.db.faiss_utils as faiss_utils
 import src.db.mongodb_utils as mongodb_utils
@@ -33,6 +33,23 @@ css = """
     
     .hide {
         display: none !important
+    }
+    
+    #result_col {
+        max-height: 90vh !important;
+    }
+    
+    #input_image {
+        max-height: 400px !important;
+    }
+    
+    #submit_btn {
+        background: #4dd2ed !important;
+    }
+    
+    #submit_btn:hover {
+        opacity: 0.9;
+        cursor: pointer; 
     }
 """
 
@@ -120,13 +137,13 @@ with gr.Blocks(css=css) as demo:
     with gr.Row(equal_height=True):
         with gr.Column(scale=2):
             text_query = gr.Textbox(label="Text query", placeholder="Enter text to search/segment images...")
-            input_image = gr.Image(label="Image", type="pil")
+            input_image = gr.Image(label="Image", type="pil", elem_id="input_image")
             top_k = gr.Number(label="Top K Results", value=3, precision=0, elem_id="top_k")
-            alpha = gr.Slider(label="Image weight", minimum=0.0, maximum=1.0, value=0.3, elem_id="img_search_weight", elem_classes=["hide"])
+            alpha = gr.Slider(label="Image weight", minimum=0.0, maximum=1.0, value=0.3, elem_id="img_search_weight")
             bg_selector = gr.Radio(choices=bg_colors.keys(), label="Background Color", value="White", elem_id="bg_selector", elem_classes=["hide"])
             task_selector = gr.Radio(choices=["Image Search", "Image Segmentation"], label="Task", value="Image Search")
-            submit_button = gr.Button("Submit")
-        with gr.Column(scale=3):
+            submit_button = gr.Button("Submit", elem_id="submit_btn")
+        with gr.Column(scale=3, elem_id="result_col"):
             output_image = gr.Gallery(label="Result", elem_id="gallery", columns=3, preview=True)
         
     submit_button.click(fn=submit, 
